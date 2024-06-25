@@ -21,6 +21,11 @@
             100% { transform: scale(1); }
         }
 
+        @keyframes move {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
         body, html {
             margin: 0;
             padding: 0;
@@ -36,11 +41,12 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: center;
             color: white;
             text-shadow: 2px 2px 4px #000000;
             animation: fadeIn 2s ease-in-out;
+            position: relative;
         }
 
         .content {
@@ -50,6 +56,7 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             text-align: center;
             max-width: 600px;
+            margin-bottom: 10px;
             animation: slideIn 1.5s ease-out;
         }
 
@@ -75,6 +82,22 @@
             background: linear-gradient(to bottom, darkgreen, darkbrown);
             animation: none;
         }
+
+        .box {
+            position: absolute;
+            width: 200px;
+            height: 100px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 2px solid #fff;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            color: #000;
+            user-select: none;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -85,6 +108,56 @@
             <p>Присоединяйся к элите и стань частью сообщества TGFaggots, где каждый игрок – герой, а каждая игра – эпическая сага!</p>
             <a href="https://t.me/+aPGpD1hHqVkxZjU6" class="join-button">Вступить Сейчас</a>
         </div>
+        <div class="box" id="box1">Уникальный геймплей</div>
+        <div class="box" id="box2">Сообщество единомышленников</div>
+        <div class="box" id="box3">Постоянные обновления</div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const boxes = [
+                { elem: document.getElementById('box1'), dx: (Math.random() * 4) - 2, dy: (Math.random() * 4) - 2 },
+                { elem: document.getElementById('box2'), dx: (Math.random() * 4) - 2, dy: (Math.random() * 4) - 2 },
+                { elem: document.getElementById('box3'), dx: (Math.random() * 4) - 2, dy: (Math.random() * 4) - 2 }
+            ];
+            const container = document.querySelector('.background');
+            const containerRect = container.getBoundingClientRect();
+
+            function moveBoxes() {
+                boxes.forEach(box => {
+                    const rect = box.elem.getBoundingClientRect();
+
+                    if (rect.left <= containerRect.left || rect.right >= containerRect.right) {
+                        box.dx = -box.dx;
+                    }
+                    if (rect.top <= containerRect.top || rect.bottom >= containerRect.bottom) {
+                        box.dy = -box.dy;
+                    }
+
+                    boxes.forEach(otherBox => {
+                        if (box !== otherBox && isColliding(rect, otherBox.elem.getBoundingClientRect())) {
+                            box.dx = -box.dx;
+                            box.dy = -box.dy;
+                            otherBox.dx = -otherBox.dx;
+                            otherBox.dy = -otherBox.dy;
+                        }
+                    });
+
+                    box.elem.style.left = `${rect.left + box.dx - containerRect.left}px`;
+                    box.elem.style.top = `${rect.top + box.dy - containerRect.top}px`;
+                });
+
+                requestAnimationFrame(moveBoxes);
+            }
+
+            function isColliding(rect1, rect2) {
+                return !(rect1.right < rect2.left ||
+                         rect1.left > rect2.right ||
+                         rect1.bottom < rect2.top ||
+                         rect1.top > rect2.bottom);
+            }
+
+            moveBoxes();
+        });
+    </script>
 </body>
 </html>
